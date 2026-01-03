@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-bg: #09090b;
+  --color-dark-surface: #18181b;
+  --color-dark-border: #27272a;
+
+  /* DEV: Blue/Cyan */
+  --color-dev-bg: #083344;
+  --color-dev-fg: #67e8f9;
+  --color-dev-accent: #06b6d4;
+
+  /* QA: Yellow */
+  --color-qa-bg: #422006;
+  --color-qa-fg: #fef08a;
+  --color-qa-accent: #eab308;
+
+  /* STAGING: Purple */
+  --color-staging-bg: #2e1065;
+  --color-staging-fg: #d8b4fe;
+  --color-staging-accent: #a855f7;
+
+  /* PROD: Red */
+  --color-prod-bg: #450a0a;
+  --color-prod-fg: #fca5a5;
+  --color-prod-accent: #ef4444;
+}
+
+body {
+  background-color: var(--color-dark-bg);
+  color: white;
+}
+
+/* Global utility classes for dynamic theming based on EnvironmentContext */
+.theme-accent {
+  color: var(--color-prod-accent);
+}
+
+.env-dev .theme-accent {
+  color: var(--color-dev-accent);
+}
+
+.env-qa .theme-accent {
+  color: var(--color-qa-accent);
+}
+
+.env-staging .theme-accent {
+  color: var(--color-staging-accent);
+}
+
+.theme-border {
+  border-color: var(--color-prod-accent);
+}
+
+.env-dev .theme-border {
+  border-color: var(--color-dev-accent);
+}
+
+.env-qa .theme-border {
+  border-color: var(--color-qa-accent);
+}
+
+.env-staging .theme-border {
+  border-color: var(--color-staging-accent);
+}
+
+/* Intensive Immersive Layout Backgrounds */
+.theme-body-bg {
+  background-color: var(--color-dark-bg);
+  background-image: radial-gradient(circle at top right, rgba(239, 68, 68, 0.15), transparent);
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.env-prod .theme-body-bg {
+  background-color: #2d0606;
+  background-image: radial-gradient(circle at top right, rgba(239, 68, 68, 0.3), transparent);
+}
+
+.env-dev .theme-body-bg {
+  background-color: #061822;
+  background-image: radial-gradient(circle at top right, rgba(6, 182, 212, 0.3), transparent);
+}
+
+.env-qa .theme-body-bg {
+  background-color: #230b05;
+  background-image: radial-gradient(circle at top right, rgba(249, 115, 22, 0.3), transparent);
+}
+
+.env-staging .theme-body-bg {
+  background-color: #1a0b36;
+  background-image: radial-gradient(circle at top right, rgba(168, 85, 247, 0.3), transparent);
+}
+
+.theme-header-bg {
+  background-color: rgba(9, 9, 11, 0.9);
+  border-bottom: 1px solid var(--color-dark-border);
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.env-prod .theme-header-bg {
+  background-color: rgba(69, 10, 10, 0.95);
+  border-bottom-color: rgba(239, 68, 68, 0.8);
+}
+
+.env-dev .theme-header-bg {
+  background-color: rgba(8, 51, 68, 0.95);
+  border-bottom-color: rgba(6, 182, 212, 0.8);
+}
+
+.env-qa .theme-header-bg {
+  background-color: rgba(66, 32, 6, 0.95);
+  border-bottom-color: rgba(234, 179, 8, 0.8);
+}
+
+.env-staging .theme-header-bg {
+  background-color: rgba(46, 16, 101, 0.95);
+  border-bottom-color: rgba(168, 85, 247, 0.8);
+}
+
+.theme-footer-bg {
+  background-color: var(--color-dark-bg);
+  border-top: 1px solid var(--color-dark-border);
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.env-prod .theme-footer-bg {
+  background-color: #450a0a;
+  border-top-color: rgba(239, 68, 68, 0.6);
+}
+
+.env-dev .theme-footer-bg {
+  background-color: #083344;
+  border-top-color: rgba(6, 182, 212, 0.6);
+}
+
+.env-qa .theme-footer-bg {
+  background-color: #422006;
+  border-top-color: rgba(234, 179, 8, 0.6);
+}
+
+.env-staging .theme-footer-bg {
+  background-color: #2e1065;
+  border-top-color: rgba(168, 85, 247, 0.6);
+}
+
+/* Sidebar & Cards */
+.theme-sidebar-bg {
+  background-color: var(--color-dark-surface);
+  border-right: 1px solid var(--color-dark-border);
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.env-prod .theme-sidebar-bg {
+  background-color: #450a0a;
+}
+
+.env-dev .theme-sidebar-bg {
+  background-color: #083344;
+}
+
+.env-qa .theme-sidebar-bg {
+  background-color: #422006;
+}
+
+.env-staging .theme-sidebar-bg {
+  background-color: #2e1065;
+}
+
+.theme-card-bg {
+  background-color: rgba(24, 24, 27, 0.2);
+  border: 1px solid var(--color-dark-border);
+  transition: all 0.5s ease;
+}
+
+.env-prod .theme-card-bg {
+  background-color: rgba(127, 29, 29, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.env-dev .theme-card-bg {
+  background-color: rgba(8, 145, 178, 0.2);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.env-qa .theme-card-bg {
+  background-color: rgba(161, 98, 7, 0.2);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.env-staging .theme-card-bg {
+  background-color: rgba(88, 28, 135, 0.2);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.theme-bg-subtle {
+  background-color: var(--color-prod-bg);
+}
+
+.env-dev .theme-bg-subtle {
+  background-color: var(--color-dev-bg);
+}
+
+.env-qa .theme-bg-subtle {
+  background-color: var(--color-qa-bg);
+}
+
+.env-staging .theme-bg-subtle {
+  background-color: var(--color-staging-bg);
+}
+
+.theme-button-active {
+  background-color: var(--color-prod-bg);
+  color: var(--color-prod-accent);
+  border-color: var(--color-prod-accent);
+}
+
+.env-dev .theme-button-active {
+  background-color: var(--color-dev-bg);
+  color: var(--color-dev-accent);
+  border-color: var(--color-dev-accent);
+}
+
+.env-qa .theme-button-active {
+  background-color: var(--color-qa-bg);
+  color: var(--color-qa-accent);
+  border-color: var(--color-qa-accent);
+}
+
+.env-staging .theme-button-active {
+  background-color: var(--color-staging-bg);
+  color: var(--color-staging-accent);
+  border-color: var(--color-staging-accent);
+}

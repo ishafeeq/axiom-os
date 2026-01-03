@@ -1,0 +1,11 @@
+.cargo_home
+testing-proj
+new-testing
+axiom-ccp/.logs/*
+axiom-ccp/target/*
+axiom-ccp/axiom-ccp-backend/target/*
+axiom-ccp/axiom-ccp-frontend/target/*
+axiom-ccp/axiom-ccp-frontend/node_modules/*
+axiom-ccp/axiom-ccp-frontend/dist/*
+axiom-cli/target/*
+axiom-shell/target/*
