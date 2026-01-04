@@ -6,12 +6,25 @@ use clap::{Parser, Subcommand};
 use colored::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fs;
+use std::fs::{self, File};
 use std::io::{self, Write};
-use std::path::Path;
-use std::process::Command;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
-use toml;
+use zip::ZipArchive;
+
+// Pillar 10: Bundling Logic
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+const SHELL_BIN: &[u8] = include_bytes!("../assets/axiom-shell-darwin-arm64");
+#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+const SHELL_BIN: &[u8] = include_bytes!("../assets/axiom-shell-darwin-x64");
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+const SHELL_BIN: &[u8] = include_bytes!("../assets/axiom-shell-linux-arm64");
+#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+const SHELL_BIN: &[u8] = include_bytes!("../assets/axiom-shell-linux-x64");
+
+const CCP_BACKEND_BIN: &[u8] = include_bytes!("../assets/axiom-ccp");
+const CCP_FRONTEND_ZIP: &[u8] = include_bytes!("../assets/ccp-frontend.zip");
 
 #[derive(Parser)]
 #[command(name = "ax")]
@@ -94,6 +107,8 @@ enum Commands {
     },
     /// Push changes (git push + wasm upload)
     Push,
+    /// Upgrade the ax CLI to the latest version via GitHub Releases
+    Update,
 }
 
 #[derive(Subcommand)]
@@ -249,6 +264,9 @@ async fn main() -> Result<()> {
         Commands::Push => {
             push_all().await?;
         }
+        Commands::Update => {
+            handle_update().await?;
+        }
     }
 
     Ok(())
@@ -289,48 +307,76 @@ async fn init_project(name_arg: Option<String>, env: &str) -> Result<()> {
     let ccp_check = client.get(format!("{}/tomains", CCP_BASE_URL)).send().await;
     
     if ccp_check.is_err() {
-        println!("{} Axiom Control Plane (CCP) is not running. Attempting to start it in the background...", "⚠️".yellow().bold());
+        println!("{} Axiom Control Plane (CCP) is not running. Attempting to start the embedded CCP in the background...", "⚠️".yellow().bold());
         
-        let mut ccp_dir = Path::new("../axiom-ccp").to_path_buf();
-        if !ccp_dir.exists() {
-            ccp_dir = Path::new("../../axiom-ccp").to_path_buf();
-        }
-
-        if ccp_dir.exists() {
-            let _script_path = ccp_dir.join("dev.sh");
-            let dir_str = ccp_dir.to_str().unwrap_or("..");
+        let home_dir = dirs::home_dir().expect("Could not find home directory");
+        let axiom_config_dir = home_dir.join(".axiom");
+        let axiom_bin_dir = axiom_config_dir.join("bin");
+        let axiom_ccp_dir = axiom_config_dir.join("ccp");
+        
+        // Extraction: If .axiom/bin doesn't exist, extract assets
+        if !axiom_bin_dir.exists() {
+            println!("{} Extracting embedded Axiom Toolchains to {:?}...", "📦".cyan(), axiom_bin_dir);
+            fs::create_dir_all(&axiom_bin_dir)?;
             
-            Command::new("sh")
-                .arg("-c")
-                .arg(format!("cd {} && nohup ./dev.sh > /dev/null 2>&1 &", dir_str))
-                .spawn()
-                .context("Failed to spawn CCP dev script")?;
-                
-            print!("{} Waiting for CCP to become healthy", "⏳".cyan());
+            let shell_path = axiom_bin_dir.join("axiom-shell");
+            fs::write(&shell_path, SHELL_BIN)?;
+            set_executable(&shell_path)?;
+    
+            let ccp_backend_path = axiom_bin_dir.join("axiom-ccp");
+            fs::write(&ccp_backend_path, CCP_BACKEND_BIN)?;
+            set_executable(&ccp_backend_path)?;
+    
+            fs::create_dir_all(&axiom_ccp_dir)?;
+            let zip_path = axiom_ccp_dir.join("frontend.zip");
+            fs::write(&zip_path, CCP_FRONTEND_ZIP)?;
+            
+            // Unzip CCP frontend files
+            let file = File::open(&zip_path)?;
+            let mut archive = ZipArchive::new(file)?;
+            archive.extract(&axiom_ccp_dir)?;
+            fs::remove_file(zip_path)?;
+        }
+        
+        let cert_dir = axiom_config_dir.join("certs");
+        if !cert_dir.join("cert.pem").exists() {
+            println!("{} Generating localhost SSL certs for CCP...", "🔐".cyan());
+            fs::create_dir_all(&cert_dir)?;
+            Command::new("openssl")
+                .args(["req", "-x509", "-newkey", "rsa:2048", "-keyout", cert_dir.join("key.pem").to_str().unwrap(), "-out", cert_dir.join("cert.pem").to_str().unwrap(), "-days", "365", "-nodes", "-subj", "/CN=localhost"])
+                .output()?;
+        }
+        
+        println!("{} Starting local CCP Dashboard...", "🌐".cyan());
+        Command::new(axiom_bin_dir.join("axiom-ccp"))
+            .env("CCP_FRONTEND_DIR", axiom_ccp_dir.to_str().unwrap())
+            .env("TLS_CERT", cert_dir.join("cert.pem"))
+            .env("TLS_KEY", cert_dir.join("key.pem"))
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .context("Failed to spawn embedded CCP")?;
+            
+        print!("{} Waiting for CCP to become healthy", "⏳".cyan());
+        io::stdout().flush()?;
+        
+        let mut is_healthy = false;
+        for _ in 0..20 { // Max 10 seconds
+            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+            print!(".");
             io::stdout().flush()?;
             
-            let mut is_healthy = false;
-            for _ in 0..20 { // Max 10 seconds
-                tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-                print!(".");
-                io::stdout().flush()?;
-                
-                if client.get(format!("{}/tomains", CCP_BASE_URL)).send().await.is_ok() {
-                    is_healthy = true;
-                    break;
-                }
+            if client.get(format!("{}/tomains", CCP_BASE_URL)).send().await.is_ok() {
+                is_healthy = true;
+                break;
             }
-            println!("");
-            
-            if !is_healthy {
-                return Err(anyhow::anyhow!("{} CCP failed to start within 10 seconds. Check logs in axiom-ccp.", "❌".red()));
-            }
-            println!("{} CCP Backend successfully booted!", "🌐".cyan());
-        } else {
-            println!("{} Error: Could not locate `axiom-ccp` folder. Please start CCP manually:", "❌".red().bold());
-            println!("  cd path/to/axiom-ccp && ./dev.sh");
-            return Err(anyhow::anyhow!("CCP not reachable. Exiting."));
         }
+        println!("");
+        
+        if !is_healthy {
+            return Err(anyhow::anyhow!("{} CCP failed to start within 10 seconds. Check logs in ~/.axiom/ccp.", "❌".red()));
+        }
+        println!("{} CCP Backend successfully booted!", "🌐".cyan());
     }
 
     // Prevent clobbering an existing active dir safely
@@ -599,21 +645,20 @@ async fn deploy_kernel(color: &str) -> Result<()> {
     if !shell_ready {
         println!("{} Axiom Shell not active. Attempting to start it in the background...", "🚀".yellow());
         
-        let shell_path = if Path::new("../axiom-shell").exists() {
-            "../axiom-shell/target/release/axiom-shell"
-        } else {
-            "../../axiom-shell/target/release/axiom-shell"
-        };
+        let home_dir = dirs::home_dir().expect("Could not find home directory");
+        let shell_path = home_dir.join(".axiom/bin/axiom-shell");
         
-        let cmd_str = if Command::new("which").arg("axiom-shell").output().map(|o| o.status.success()).unwrap_or(false) {
-            "nohup axiom-shell > /tmp/axiom_shell.log 2>&1 &"
+        let cmd_str = if shell_path.exists() {
+            format!("nohup {} > /tmp/axiom_shell.log 2>&1 &", shell_path.to_str().unwrap())
+        } else if Command::new("which").arg("axiom-shell").output().map(|o| o.status.success()).unwrap_or(false) {
+            "nohup axiom-shell > /tmp/axiom_shell.log 2>&1 &".to_string()
         } else {
-            &format!("nohup {} > /tmp/axiom_shell.log 2>&1 &", shell_path)
+            return Err(anyhow::anyhow!("{} Could not find axiom-shell executable in ~/.axiom/bin or PATH. Did you run `ax init` first?", "❌".red()));
         };
         
         Command::new("sh")
             .arg("-c")
-            .arg(cmd_str)
+            .arg(&cmd_str)
             .spawn()
             .context("Failed to spawn Axiom Shell")?;
 
@@ -1419,3 +1464,58 @@ async fn push_all() -> Result<()> {
 
     Ok(())
 }
+
+// Pillar 2: Auto-Upgrade Mechanism
+async fn handle_update() -> Result<()> {
+    println!("🔄 Checking for CLI updates...");
+    
+    let client = reqwest::Client::builder()
+        .user_agent("axiom-cli-updater")
+        .build()?;
+    
+    // Hit GitHub Releases API
+    let res: serde_json::Value = client.get("https://api.github.com/repos/your-org/axiom/releases/latest")
+        .send().await?
+        .json().await?;
+        
+    let latest_version = res["tag_name"].as_str().unwrap_or("v0.0.0");
+    println!("Latest Axiom version found: {}", latest_version);
+    
+    // Abstract matching logic to find the specific asset based on OS/Arch
+    #[cfg(target_os = "macos")] let os = "darwin";
+    #[cfg(target_os = "linux")] let os = "linux";
+    #[cfg(target_arch = "aarch64")] let arch = "arm64";
+    #[cfg(target_arch = "x86_64")] let arch = "x64";
+
+    let asset_name = format!("ax-{}-{}", os, arch);
+    let asset = res["assets"].as_array().unwrap().iter().find(|a| a["name"].as_str().unwrap().contains(&asset_name));
+
+    if let Some(asset) = asset {
+        let download_url = asset["browser_download_url"].as_str().unwrap();
+        println!("Downloading new binary from {}...", download_url);
+        
+        let response = client.get(download_url).send().await?.bytes().await?;
+        let temp_path = std::env::temp_dir().join("ax-update-tmp");
+        fs::write(&temp_path, response)?;
+
+        // Replaces currently running binary on disk
+        self_replace::self_replace(&temp_path)?;
+        fs::remove_file(temp_path)?;
+        
+        println!("✨ Successfully upgraded Axiom CLI to {}!", latest_version);
+    } else {
+        println!("No compatible binaries found for your system on this release.");
+    }
+    
+    Ok(())
+}
+
+#[cfg(unix)]
+fn set_executable(path: &Path) -> io::Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    let mut perms = fs::metadata(path)?.permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(path, perms)
+}
+#[cfg(not(unix))]
+fn set_executable(_path: &Path) -> io::Result<()> { Ok(()) }
