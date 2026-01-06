@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="docs/axiom-logo.png" alt="Axiom OS Logo" width="50">
-
   <h1>Axiom OS</h1>
   <p>The zero-gravity development environment for building and deploying distributed capabilities via WebAssembly (Wasm) Kernels and Tomains.</p>
 </div>
