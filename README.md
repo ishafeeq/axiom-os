@@ -11,11 +11,24 @@ Axiom OS is a completely new paradigm for building, deploying, and managing dist
 
 By stripping application code down to **pure business logic (Wasm Kernels)** and offloading all common layer code (DB connections, caching, authentication, logging) to our native Rust-based host (`axiom-shell`), Axiom OS delivers compounding benefits:
 
-*   **💸 Slash Cloud Bills:** Wasm Kernels share memory and boot in under a millisecond. You can run hundreds of microservices on a single $5/mo VPS that would traditionally require a massive Kubernetes cluster.
-*   **🏎️ Insane Performance:** Skip the Node.js or Python interpreter overhead. Execute at near-native speeds in a highly concurrent Rust server.
-*   **🐳 No More Memory-Hungry Docker:** Emulating full OS virtualization per microservice is incredibly wasteful. `axiom-shell` runs dozens of isolated Wasm Kernels in a single lightweight process, eradicating Docker container bloat entirely.
-*   **🧠 Optimized for AI Agents:** AI coding agents (like Cursor, Copilot, or Claude) write code exponentially faster in Axiom because there is *zero boilerplate*. They don't waste tokens writing environment variables, database drivers, or connection pools. They just write the small, focused business logic. Less tokens = faster generation, fewer bugs, and cheaper prompts. 
-*   **🛡️ Developer Velocity:** Axiom eliminates `.env` files, complex environment checks, and traditional container orchestration. Say goodbye to "it works on my machine" forever.
+### 🏎️ Unrivaled Performance & Reliability
+*   **Near-Native Execution:** Skip the Node.js or Python interpreter overhead. Execute at near-native speeds in a highly concurrent Rust server.
+*   **Built-in Telemetry & Resilience:** Stop importing bulky libraries for basic resilience. `axiom-shell` provides native, out-of-the-box support for **circuit breakers**, **smart dynamic timeouts**, and **failure handling with exponential backoff retries** at the infrastructure layer, protecting your business logic automatically.
+
+### 💸 Radical Cloud Cost Savings
+*   **Slash Cloud Bills:** Wasm Kernels share memory and boot in under a millisecond. You can run hundreds of microservices on a single $5/mo VPS that would traditionally require a massive Kubernetes cluster.
+*   **No More Memory-Hungry Docker:** Emulating full OS virtualization per microservice is incredibly wasteful. `axiom-shell` runs dozens of isolated Wasm Kernels in a single lightweight process, eradicating Docker container bloat entirely.
+
+### 🧠 Hyper-Optimized for AI Coding Agents
+*   **Zero Boilerplate Context Limits:** AI coding agents (like Cursor, Copilot, or Claude) write code exponentially faster in Axiom because there is *no scaffolding*. They don't waste precious context tokens writing environment variables, database drivers, or connection pools. 
+*   **Cheaper Prompts, Faster Output:** They just generate the small, focused business logic. Fewer tokens = faster generation, fewer bugs, and cheaper API prompt costs.
+
+### 🛡️ Unmatched Developer Velocity
+*   **Eradicate `.env` Files:** Axiom eliminates environment variables, complex environment checks, and traditional container orchestration. Say goodbye to "it works on my machine" forever.
+
+### 🌐 Language Agnostic
+*   **Write in What You Know**: Axiom Kernels compile to WebAssembly (Wasm). Currently, we provide first-class SDK support for writing Kernels in **Rust**, **Go**, and **C/C++**. 
+*   Because `axiom-shell` runs standard Wasm components, support for interpreted languages like **Python**, **Node.js/TypeScript**, and **Java** via specialized embedded runtimes is actively under development!
 
 Through the **Central Control Plane (CCP)**, you visually map physical cloud resources (Databases, Caches, Secrets) to your Kernels dynamically based on the environment context (Dev, QA, Staging, Prod).
 
