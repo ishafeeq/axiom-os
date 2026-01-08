@@ -65,6 +65,7 @@ This single command will:
 
 Axiom OS heavily relies on its unified CLI to manage environments, features, and deployments.
 
+*   `ax env <env>`: Lock the local directory's active environment context (`dev`, `qa`, `staging`, `prod`).
 *   `ax init <name>`: Scaffolds a new Wasm Kernel, starts the local Shell and CCP, and registers the Tomain.
 *   `ax deploy <env>`: Compiles the local Wasm Kernel and loads it directly into the running Axiom Shell for the specified environment (`dev`, `staging`, `prod`).
 *   `ax checkout <address>`: Clones an existing Tomain and its Capability Manifest from the CCP to your local machine (e.g., `ax checkout alpha-squad.default.my-app`).
@@ -73,6 +74,46 @@ Axiom OS heavily relies on its unified CLI to manage environments, features, and
 *   `ax push`: Compiles the current Wasm Kernel, commits local changes, and uploads the `.wasm` binary to the CCP's binary vault for staging/production promotion.
 *   `ax promote --from <env> --to <env>`: Promotes a verified Tomain (or feature) from a lower environment (like `dev` or `qa`) to a higher environment (`staging` or `prod`). The CCP automatically swaps the resource bindings during the promotion.
 *   `ax retire -m <ms> -e <env>`: Safely removes a microservice from a specific environment.
+
+---
+
+### 4. Terminal Environment Awareness (Zsh / Starship)
+
+Because Axiom relies on session-locking, you should always know what environment your terminal currently occupies (to avoid accidentally running tests against `PROD`).
+
+**Option A: Native Zsh Integration**
+Add this snippet to your `~/.zshrc` to automatically show `[DEV]`, `[QA]`, or a flashing red `[PROD]` in your prompt:
+
+```bash
+parse_axiom_env() {
+  if [ -f .axiom/session.json ]; then
+    ENV=$(grep -Eo '"environment":.*"[^"]+"' .axiom/session.json | cut -d'"' -f4)
+    case "$ENV" in
+      "PROD") echo "%F{red}[PROD] %f" ;;
+      "STAGING") echo "%F{blue}[STAGING] %f" ;;
+      "QA") echo "%F{yellow}[QA] %f" ;;
+      *) echo "%F{green}[$ENV] %f" ;;
+    esac
+  fi
+}
+
+# Enable parameter expansion in the prompt
+setopt PROMPT_SUBST
+
+# Adjust based on your preferred prompt, placing $(parse_axiom_env) at the front
+PROMPT='$(parse_axiom_env)%n@%m %1~ %# '
+```
+
+**Option B: Starship.rs**
+If you use modern cross-shell prompts like [Starship](https://starship.rs/), add this custom module to your `~/.config/starship.toml`:
+
+```toml
+[custom.axiom_env]
+command = "grep -Eo '\"environment\":.*\"[^\"]+\"' .axiom/session.json | cut -d'\"' -f4"
+when = "test -f .axiom/session.json"
+format = "[$output]($style) "
+style = "bold red"
+```
 
 ---
 
