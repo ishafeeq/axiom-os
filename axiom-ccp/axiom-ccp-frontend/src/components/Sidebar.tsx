@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useEnvironment } from '../context/EnvironmentContext';
 import { useTomains } from '../api/tomainClient';
 import { CreateAppModal } from './CreateAppModal';
-import { Archive, KeySquare, TerminalSquare, ShieldCheck, PlusCircle, LayoutGrid, ChevronRight, ChevronDown } from 'lucide-react';
+import { Archive, KeySquare, TerminalSquare, PlusCircle, LayoutGrid, ChevronRight, ChevronDown } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { environment } = useEnvironment();
@@ -35,8 +35,8 @@ export const Sidebar: React.FC = () => {
       <div className={`w-64 border-r border-dark-border theme-sidebar-bg min-h-screen flex flex-col p-4 transition-all duration-700`}>
         <div className="flex items-center gap-3 mb-10 px-2">
            <Link to="/" className="flex items-center gap-3">
-              <div className="p-2 bg-dark-surface rounded-lg border border-dark-border shadow-lg">
-                 <ShieldCheck size={24} className="theme-accent transition-colors duration-300" />
+              <div className="w-10 h-10 bg-dark-surface rounded-lg border border-dark-border shadow-lg flex items-center justify-center font-bold text-xl theme-accent tracking-tighter">
+                 AX
               </div>
               <div>
                  <h1 className="text-xl font-bold tracking-tight">Axiom Reach</h1>

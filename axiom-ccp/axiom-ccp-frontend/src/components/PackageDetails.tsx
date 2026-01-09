@@ -91,7 +91,7 @@ export const PackageDetails: React.FC<{ isExplorer?: boolean }> = ({ isExplorer 
               </div>
               <div className="h-[650px] border border-dark-border rounded-2xl overflow-hidden bg-black/40 shadow-inner relative group/docs">
                   <iframe 
-                    src={`http://localhost:3000/api/v1/docs/${packageId}`}
+                    src={`/api/v1/docs/${packageId}`}
                     className="w-full h-full border-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-500"
                     title={`Axiom API Explorer - ${packageId}`}
                   />

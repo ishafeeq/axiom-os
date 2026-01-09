@@ -1,0 +1,16 @@
+# 2. /etc/systemd/system/axiom-ccp-backend.service
+[Unit]
+Description=Axiom CCP Backend (Control Plane API)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/var/www/axiom
+ExecStart=/var/www/axiom/bin/axiom-ccp-backend
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

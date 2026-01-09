@@ -17,7 +17,7 @@ export const TomainMap: React.FC = () => {
   // Mock fetching connection metadata from the CCP Backend
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:3000/api/v1/tomains/last-mile-tech/scheduling/fleet-mgmt/resolve?color=${environment}`)
+    fetch(`/api/v1/tomains/last-mile-tech/scheduling/fleet-mgmt/resolve?color=${environment}`)
       .then(res => res.json())
       .then(data => {
         setMetadata(data);

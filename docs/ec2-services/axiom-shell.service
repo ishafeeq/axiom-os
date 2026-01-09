@@ -1,0 +1,20 @@
+# This directory contains the systemd service templates for EC2
+# These help answer the question of "How to run the binaries on EC2"
+
+# 1. /etc/systemd/system/axiom-shell.service
+[Unit]
+Description=Axiom Shell Supervisor (WASM Runtime proxy)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/var/www/axiom
+ExecStart=/var/www/axiom/bin/axiom-shell
+Restart=always
+RestartSec=5
+# Adjust based on expected traffic
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

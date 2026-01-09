@@ -47,12 +47,6 @@ macro_rules! debug {
     };
 }
 
-// Internal trait to help collect metadata (hidden from docs)
-#[doc(hidden)]
-pub trait AxiomApiMetadata {
-    fn metadata() -> &'static str;
-}
-
 #[macro_export]
 macro_rules! axiom_runtime {
     () => {

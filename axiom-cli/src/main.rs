@@ -213,6 +213,24 @@ fn load_or_prompt_config() -> Result<AxiomConfig> {
     Ok(config)
 }
 
+fn resolve_bin(name: &str) -> String {
+    // 1. Try PATH
+    if let Ok(path) = which::which(name) {
+        return path.to_string_lossy().to_string();
+    }
+    // 2. Try ~/.cargo/bin/ for cargo
+    if name == "cargo" {
+        if let Some(home) = dirs::home_dir() {
+            let path = home.join(".cargo/bin/cargo");
+            if path.exists() {
+                return path.to_string_lossy().to_string();
+            }
+        }
+    }
+    // 3. Fallback
+    name.to_string()
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -348,7 +366,7 @@ async fn init_project(name_arg: Option<String>, env: &str) -> Result<()> {
         }
         
         println!("{} Starting local CCP Dashboard...", "🌐".cyan());
-        Command::new(axiom_bin_dir.join("axiom-ccp"))
+        Command::new(resolve_bin("axiom-ccp"))
             .env("CCP_FRONTEND_DIR", axiom_ccp_dir.to_str().unwrap())
             .env("TLS_CERT", cert_dir.join("cert.pem"))
             .env("TLS_KEY", cert_dir.join("key.pem"))
@@ -441,9 +459,27 @@ pub fn submit_data(payload: String) -> String {
 axiom_export_reflect!(get_user_profile, submit_data);
 "##)?;
 
-    let axiom_sdk_path = dirs::home_dir()
-        .map(|h| h.join("Documents/axiom-sdk/axiom-sdk").to_string_lossy().to_string())
-        .unwrap_or_else(|| "../axiom-sdk".to_string()); // fallback
+    // Dynamic SDK Path Resolution:
+    // 1. Check /var/www/axiom/src/axiom-sdk (EC2 Production Sync Path)
+    // 2. Check ~/Documents/axiom-sdk (Local Dev Path)
+    // 3. Fallback to ../axiom-sdk (Relative Path)
+    let axiom_sdk_path = {
+        let ec2_path = Path::new("/var/www/axiom/src/axiom-sdk");
+        if ec2_path.exists() {
+            ec2_path.to_string_lossy().to_string()
+        } else {
+            dirs::home_dir()
+                .map(|h| {
+                    let local_path = h.join("Documents/axiom-sdk");
+                    if local_path.exists() {
+                        local_path.to_string_lossy().to_string()
+                    } else {
+                        "../axiom-sdk".to_string()
+                    }
+                })
+                .unwrap_or_else(|| "../axiom-sdk".to_string())
+        }
+    };
 
     fs::write("Cargo.toml", format!(
 r#"[package]
@@ -646,15 +682,8 @@ async fn deploy_kernel(color: &str) -> Result<()> {
         println!("{} Axiom Shell not active. Attempting to start it in the background...", "🚀".yellow());
         
         let home_dir = dirs::home_dir().expect("Could not find home directory");
-        let shell_path = home_dir.join(".axiom/bin/axiom-shell");
-        
-        let cmd_str = if shell_path.exists() {
-            format!("nohup {} > /tmp/axiom_shell.log 2>&1 &", shell_path.to_str().unwrap())
-        } else if Command::new("which").arg("axiom-shell").output().map(|o| o.status.success()).unwrap_or(false) {
-            "nohup axiom-shell > /tmp/axiom_shell.log 2>&1 &".to_string()
-        } else {
-            return Err(anyhow::anyhow!("{} Could not find axiom-shell executable in ~/.axiom/bin or PATH. Did you run `ax init` first?", "❌".red()));
-        };
+        let bin = resolve_bin("axiom-shell");
+        let cmd_str = format!("nohup {} > /tmp/axiom_shell.log 2>&1 &", bin);
         
         Command::new("sh")
             .arg("-c")
@@ -866,10 +895,10 @@ async fn deploy_kernel(color: &str) -> Result<()> {
     }
 
     println!("{} Compiling Wasm Kernel (wasm32-unknown-unknown)...", "⚙️".cyan());
-    let status = Command::new("cargo")
+    let status = Command::new(resolve_bin("cargo"))
         .args(["build", "--target", "wasm32-unknown-unknown", "--release"])
         .status()
-        .context("Cargo build failed. Make sure target is installed via `rustup target add wasm32-unknown-unknown`")?;
+        .context("Cargo build failed. Make sure cargo is in your PATH or ~/.cargo/bin/cargo exists.")?;
 
     if !status.success() {
         return Err(anyhow::anyhow!("Compilation failed."));
@@ -1392,7 +1421,7 @@ async fn push_all() -> Result<()> {
     println!("{} Pushing changes...", "🚀".cyan());
 
     // 1. git push
-    let status = Command::new("git")
+    let status = Command::new(resolve_bin("git"))
         .arg("push")
         .status()
         .context("Failed to git push")?;
@@ -1403,7 +1432,7 @@ async fn push_all() -> Result<()> {
 
     // 2. Compile Wasm
     println!("{} Compiling Wasm binary...", "⚙️".cyan());
-    let compile_status = Command::new("cargo")
+    let compile_status = Command::new(resolve_bin("cargo"))
         .args(["build", "--target", "wasm32-unknown-unknown", "--release"])
         .status()?;
 
@@ -1413,7 +1442,7 @@ async fn push_all() -> Result<()> {
 
     // 3. Upload hash to CCP Binary Vault
     // Detect branch name
-    let branch_output = Command::new("git")
+    let branch_output = Command::new(resolve_bin("git"))
         .args(["rev-parse", "--abbrev-ref", "HEAD"])
         .output()?;
     let branch = String::from_utf8_lossy(&branch_output.stdout).trim().to_string();

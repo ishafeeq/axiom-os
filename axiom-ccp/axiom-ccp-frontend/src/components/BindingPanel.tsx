@@ -16,7 +16,7 @@ export const BindingPanel: React.FC = () => {
   const { data: bindings, isLoading, error } = useQuery<PhysicalBinding[]>({
     queryKey: ['bindings'],
     queryFn: async () => {
-      const res = await fetch('http://localhost:3000/api/v1/bindings');
+      const res = await fetch('/api/v1/bindings');
       if (!res.ok) throw new Error('Failed to fetch bindings');
       return res.json();
     }

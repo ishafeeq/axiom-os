@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { ShieldCheck, UserCircle } from 'lucide-react';
+import { UserCircle } from 'lucide-react';
 import { ContextSwitcher } from './components/ContextSwitcher';
 import { Sidebar } from './components/Sidebar';
 import { ServerGrid } from './components/ServerGrid';
@@ -26,10 +26,12 @@ export const Dashboard: React.FC = () => {
         {!isExplorer && (
           <header className="flex justify-between items-center px-8 py-6 theme-header-bg sticky top-0 z-10 backdrop-blur-md">
              <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                   <ShieldCheck size={28} className="theme-accent" />
-                   CCP Dashboard
-                </h1>
+                 <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+                    <div className="w-10 h-10 bg-dark-surface rounded-lg border border-dark-border shadow-lg flex items-center justify-center font-black text-2xl theme-accent tracking-tighter">
+                       AX
+                    </div>
+                    Axiom-CCP
+                 </h1>
                 <p className="text-gray-400 mt-1">Manage hybrid-cloud deployments and environment capabilities.</p>
              </div>
              

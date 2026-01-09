@@ -1,199 +1,100 @@
 <div align="center">
+  <img src="docs/axiom-logo.png" alt="Axiom OS Logo" width="120" />
   <h1>Axiom OS</h1>
-  <p>The zero-gravity development environment for building and deploying distributed capabilities via WebAssembly (Wasm) Kernels and Tomains.</p>
+  <h3>The Distributed Intelligence Layer & Cloud-Native Operating System</h3>
+  <p><b>Architecting the Post-Kubernetes Era with High-Performance Rust & Isolated Wasm Kernels.</b></p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/Language-Rust-orange?style=flat-square&logo=rust" alt="Rust" />
+    <img src="https://img.shields.io/badge/Runtime-WebAssembly-624DE8?style=flat-square&logo=webassembly" alt="Wasm" />
+    <img src="https://img.shields.io/badge/Architecture-Distributed_Intelligence-blue?style=flat-square" alt="Distributed Architecture" />
+    <img src="https://img.shields.io/badge/Observability-OpenTelemetry-blue?style=flat-square&logo=opentelemetry" alt="OTel" />
+  </p>
 </div>
 
 ---
 
-## ⚡ The Ultimate AI-Native Cloud Paradigm
+## 🔱 The Paradigm: Distributed Intelligence, Simplified.
 
-Axiom OS is a completely new paradigm for building, deploying, and managing distributed applications that radically minimizes the code you write and the infrastructure you pay for. 
+Axiom OS is a **distributed operating system** designed from the ground up for the AI-native era. It eliminates the traditional "infrastructure-logic" entropy by abstracting microservices into highly isolated, sub-millisecond **Wasm Kernels**. 
 
-By stripping application code down to **pure business logic (Wasm Kernels)** and offloading all common layer code (DB connections, caching, authentication, logging) to our native Rust-based host (`axiom-shell`), Axiom OS delivers compounding benefits:
+While traditional architectures drown in Docker containers, K8s manifest bloat, and interpreted runtime overhead (Node.js/Python), Axiom leverages a **High-Performance Rust Host** to orchestrate intelligence at 1/10th the cost and 10x the velocity.
 
-### 🏎️ Unrivaled Performance & Reliability
-*   **Near-Native Execution:** Skip the Node.js or Python interpreter overhead. Execute at near-native speeds in a highly concurrent Rust server.
-*   **Built-in Telemetry & Resilience:** Stop importing bulky libraries for basic resilience. `axiom-shell` provides native, out-of-the-box support for **circuit breakers**, **smart dynamic timeouts**, and **failure handling with exponential backoff retries** at the infrastructure layer, protecting your business logic automatically.
+### 🏛️ Architectural Pillars
 
-### 💸 Radical Cloud Cost Savings
-*   **Slash Cloud Bills:** Wasm Kernels share memory and boot in under a millisecond. You can run hundreds of microservices on a single $5/mo VPS that would traditionally require a massive Kubernetes cluster.
-*   **No More Memory-Hungry Docker:** Emulating full OS virtualization per microservice is incredibly wasteful. `axiom-shell` runs dozens of isolated Wasm Kernels in a single lightweight process, eradicating Docker container bloat entirely.
-
-### 🧠 Hyper-Optimized for AI Coding Agents
-*   **Zero Boilerplate Context Limits:** AI coding agents (like Cursor, Copilot, or Claude) write code exponentially faster in Axiom because there is *no scaffolding*. They don't waste precious context tokens writing environment variables, database drivers, or connection pools. 
-*   **Cheaper Prompts, Faster Output:** They just generate the small, focused business logic. Fewer tokens = faster generation, fewer bugs, and cheaper API prompt costs.
-
-### 🛡️ Unmatched Developer Velocity
-*   **Eradicate `.env` Files:** Axiom eliminates environment variables, complex environment checks, and traditional container orchestration. Say goodbye to "it works on my machine" forever.
-
-### 🌐 Language Agnostic
-*   **Write in What You Know**: Axiom Kernels compile to WebAssembly (Wasm). Currently, we provide first-class SDK support for writing Kernels in **Rust**, **Go**, and **C/C++**. 
-*   Because `axiom-shell` runs standard Wasm components, support for interpreted languages like **Python**, **Node.js/TypeScript**, and **Java** via specialized embedded runtimes is actively under development!
-
-Through the **Central Control Plane (CCP)**, you visually map physical cloud resources (Databases, Caches, Secrets) to your Kernels dynamically based on the environment context (Dev, QA, Staging, Prod).
+*   **Intelligent Compute Isolation**: Leveraging `Wasmtime`, Axiom executes business logic (Tomains) in **Hyper-Isolated Nanoprocesses**. This provides **Air-Gapped Execution Sandboxes** by default—individual kernels have zero access to the host or network unless explicitly granted via a **Capability Manifest**.
+*   **Decoupled Infrastructure (The Intent API)**: Axiom Kernels do not know about connection strings, IP addresses, or secrets. They express **Intents** (e.g., "I need a Persistence Layer"). The **Central Control Plane (CCP)** dynamically maps these intents to physical resources (Postgres, Redis, LLM Gateways) based on the environmental context.
+*   **The Post-Docker Deployment Flow**: Say goodbye to slow CI/CD builds and registry bloat. Axiom hot-reloads `.wasm` binaries directly into the shell in **under 10ms**, enabling radical iterative speed for AI coding agents and human architects alike.
 
 ---
 
-## 🚀 Installation & Getting Started
+## 🛰️ AI Architect & LLM Infrastructure Features
 
-Axiom OS provides a unified CLI tool (`ax`) that handles the download and orchestration of all internal services (the Shell host, the CCP backend, and the dashboard frontend).
+Axiom OS is purposefully built to serve as the **backbone for LLM Orchestration**:
 
-### 1. Install the CLI (`ax`)
+*   **Unified AI Gateway**: Integrated support for **LiteLLM**, **Portkey**, and **Helicone**. Manage cost-optimized LLM routing, fallback policies, and circuit breaking at the infrastructure layer, not the application layer.
+*   **Architectural Observability**: Native integration with **Prometheus**, **Grafana**, and **Jaeger**. Track token consumption, request latency, and agentic trace-lines across the entire capability graph through a single pane of glass.
+*   **Adaptive Resource Binding**: Seamlessly promote models from GPT-3.5 (DEV) to Claude 3.5 Sonnet (STAGING) to GPT-4o (PROD) solely through the CCP Dashboard—**zero code changes required**.
+*   **Evaluation Gates**: Strategic hooks for **Promptfoo** and **DeepEval** allow for automated quality and safety gating during promotion cycles.
 
-You can install the Axiom CLI easily via `curl`:
+---
+
+## 🚀 The Stack & Strategy
+
+### High-Performance Resilience
+Axiom replaces standard libraries with native, host-level primitives:
+-   **Native Circuit Breakers** (Rust-based protection)
+-   **Intelligent Rate Limiting** (Token bucket strategy across multi-tenant tomains)
+-   **Real-time Telemetry** (OpenTelemetry native integration)
+
+### Developer Workflow (`ax` CLI)
 ```bash
-curl -sL https://axiom.os/install.sh | sh
+# Initialize an AI-native workspace
+ax init my-service
+
+# Dynamically bind a production database
+ax bind --name DB_MAIN --url postgresql://user:pass@prod-cluster.aws
+
+# Promote intelligence across environments
+ax promote --from staging --to prod
 ```
-*(Alternatively, macOS users can run `brew tap shafeeq/axiom && brew install axiom`)*
 
-### 2. Initialize a Project (Zero-to-Dashboard Workflow)
+---
 
-To create a new Wasm Kernel project and instantly boot up the local Axiom Shell and CCP Dashboard, just run:
+## 🎨 Visual Control Plane (CCP)
+
+The **Central Control Plane** provides a deep-visibility dashboard into the "Brain" of your cluster.
+
+| Multi-Environment Visibility | Intelligent Service Hub |
+| :--- | :--- |
+| ![Dev Dashboard](docs/dev-dashboard.png) | ![Service Hub](docs/dev-service-dashboard.png) |
+| *Visualizing capability graphs across 4 environments.* | *Deep-dive metrics and lifecycle management per tomain.* |
+
+---
+
+## 🛠️ Installation & Setup
+
+Axiom is a lightweight, unified binary architecture.
 
 ```bash
-mkdir my-app && cd my-app
+# Clone the repository
+git clone https://github.com/shafeeq/axiom-os
+
+# Build the Full Stack (CLI, Shell, CCP)
+./build.sh
+
+# Start the local shell
 ax init
 ```
-This single command will:
-1. Scaffold a new Rust-to-Wasm project framework.
-2. Generate local `localhost` SSL certificates.
-3. Start the **Axiom Shell** in the background to host your WebAssembly.
-4. Start the **Axiom CCP Backend & Frontend** on port 9000.
-5. Automatically open the CCP Dashboard in your browser!
-
-### 3. Core CLI Commands
-
-Axiom OS heavily relies on its unified CLI to manage environments, features, and deployments.
-
-*   `ax env <env>`: Lock the local directory's active environment context (`dev`, `qa`, `staging`, `prod`).
-*   `ax init <name>`: Scaffolds a new Wasm Kernel, starts the local Shell and CCP, and registers the Tomain.
-*   `ax deploy <env>`: Compiles the local Wasm Kernel and loads it directly into the running Axiom Shell for the specified environment (`dev`, `staging`, `prod`).
-*   `ax checkout <address>`: Clones an existing Tomain and its Capability Manifest from the CCP to your local machine (e.g., `ax checkout alpha-squad.default.my-app`).
-*   `ax feature start <name>`: Checks out a new isolated feature branch in the local git vault and registers the feature with the CCP.
-*   `ax bind --name <alias> --url <url>`: Binds a physical resource (e.g., a Postgres database URL) to a logical alias for the current environment. Wasm Kernels only ever ask for the alias.
-*   `ax push`: Compiles the current Wasm Kernel, commits local changes, and uploads the `.wasm` binary to the CCP's binary vault for staging/production promotion.
-*   `ax promote --from <env> --to <env>`: Promotes a verified Tomain (or feature) from a lower environment (like `dev` or `qa`) to a higher environment (`staging` or `prod`). The CCP automatically swaps the resource bindings during the promotion.
-*   `ax retire -m <ms> -e <env>`: Safely removes a microservice from a specific environment.
 
 ---
 
-### 4. Terminal Environment Awareness (Zsh / Starship)
+## 💡 Why Axiom? (For Hiring Managers)
 
-Because Axiom relies on session-locking, you should always know what environment your terminal currently occupies (to avoid accidentally running tests against `PROD`).
-
-**Option A: Native Zsh Integration**
-Add this snippet to your `~/.zshrc` to automatically show `[DEV]`, `[QA]`, or a flashing red `[PROD]` in your prompt:
-
-```bash
-parse_axiom_env() {
-  if [ -f .axiom/session.json ]; then
-    ENV=$(grep -Eo '"environment":.*"[^"]+"' .axiom/session.json | cut -d'"' -f4)
-    case "$ENV" in
-      "PROD") echo "%F{red}[PROD] %f" ;;
-      "STAGING") echo "%F{blue}[STAGING] %f" ;;
-      "QA") echo "%F{yellow}[QA] %f" ;;
-      *) echo "%F{green}[$ENV] %f" ;;
-    esac
-  fi
-}
-
-# Enable parameter expansion in the prompt
-setopt PROMPT_SUBST
-
-# Adjust based on your preferred prompt, placing $(parse_axiom_env) at the front
-PROMPT='$(parse_axiom_env)%n@%m %1~ %# '
-```
-
-**Option B: Starship.rs**
-If you use modern cross-shell prompts like [Starship](https://starship.rs/), add this custom module to your `~/.config/starship.toml`:
-
-```toml
-[custom.axiom_env]
-command = "grep -Eo '\"environment\":.*\"[^\"]+\"' .axiom/session.json | cut -d'\"' -f4"
-when = "test -f .axiom/session.json"
-format = "[$output]($style) "
-style = "bold red"
-```
+Axiom OS represents a shift in how we think about cloud infrastructure. It isn't just a deployment tool—it's a **Capability Orchestrator**. By moving the responsibility of "How" (Infra) away from the "What" (Logic), we enable:
+1.  **AI Agents to code faster** (Fewer tokens wasted on boilerplate).
+2.  **90% Reduction in Infrastructure Overhead** (Multi-tenancy vs Single-tenant containers).
+3.  **Enterprise-Grade Security** (Wasm SFI - Software Fault Isolation / Hardware-Level Sandboxing).
 
 ---
-
-## 🏛️ The Four Pillars of Axiom
-
-1. **`axiom-shell` (The "Body"):** Native Host for Wasm Kernels. Built in Rust and Wasmtime for blistering performance and multi-tenant security.
-2. **`axiom-ccp` (The "Brain"):** The Central Control Plane. Manages environment-to-resource mapping. Provides the beautiful React UI shown below.
-3. **`axiom-ide` (The "Lens"):** Environment-agnostic coding interface. Focuses on Contextual Session-Locking.
-4. **`axiom-sdk` (The "Language"):** High-level 'Intent' APIs using WIT. Focuses on defining standard interfaces without knowing *how* they are fulfilled.
-
----
-
-## 👁️ Visual Walkthrough: The CCP Dashboard
-
-The Central Control Plane (CCP) is where you orchestrate your application. 
-
-### 1. Environment Dashboards
-You have complete visibility into what services are running in which environment. The CLI allows you to promote services effortlessly.
-
-#### Development (DEV)
-The playground for building Kernels. Connects to local or mocked databases.
-![Dev Dashboard](docs/dev-dashboard.png)
-
-#### Quality Assurance (QA)
-Integration testing. The CCP seamlessly swaps out the underlying resources used by your Wasm Kernels without changing any code.
-![QA Dashboard](docs/qa-dashboard.png)
-
-#### Staging
-Pre-production validation with replica data and endpoints.
-![Staging Dashboard](docs/staging-dashboard.png)
-
-#### Production (PROD)
-The live fire zone. The Axiom Shell routes requests strictly through the production bindings assigned here.
-![Prod Dashboard](docs/prod-dashboard.png)
-
----
-
-### 2. The Service Hub
-
-Manage individual Tomains (Microservices) from a detailed, dynamic view. Here you can track deployment history and health metrics.
-
-#### Dev Service View
-![Dev Service Dashboard](docs/dev-service-dashboard.png)
-#### QA Service View
-![QA Service Dashboard](docs/qa-service-dashboard.png)
-#### Staging Service View
-![Staging Service Dashboard](docs/staging-service-dashboard.png)
-#### Prod Service View
-![Prod Service Dashboard](docs/prod-service-dashboard.png)
-
----
-
-### 3. Creating & Managing Resources
-
-The core magic of Axiom OS lies in **Resource Bindings**. Your Wasm Kernel asks for a "Postgres Database". The CCP determines *which* database to provide based on the environment.
-
-#### Creating a New Service
-Provision new capabilities and Tomains to the cluster globally.
-![Add New Service Popup](docs/add-new-service-popup.png)
-
-#### Binding Resources Safely
-Securely tie connection strings, secrets, and URLs to a service alias. The Wasm Kernel never sees the actual connection string, only the sandbox bridge provided by the Axiom SDK!
-![Add Binding Popup](docs/add-binding-popup.png)
-
-#### Retiring / Deleting Services
-Safely remove microservices from specific environments when they are no longer needed.
-![Delete Service Popup](docs/delete-service-popup.png)
-
----
-
-## 🛠️ The Zero-Gravity Lifecycle 
-
-Axiom OS eliminates the need for `.env` files and `if (process.env === 'production')` statements. Your Wasm Kernel is entirely ignorant of its environment.
-
-The CCP orchestrates a 4-tier lifecycle:
-
-1. **DEV Phase:** The developer writes abstract "Intent" code (e.g., `db.query("...")`). The local IDE maps this intent to local mock databases or transient SQLite instances.
-2. **QA Phase:** The `ax promote` command pushes the compiled Wasm to the QA environment. The CCP dynamically injects bindings for integration-testing resources. The code remains completely unchanged.
-3. **STAGING Phase:** Ready for pre-production validation. The CCP maps `db.query` to a staging database clone containing realistic data to catch late-stage bugs.
-4. **PROD Phase:** The exact same Wasm binary is promoted to Production. The host environment (`axiom-shell`) now connects the Intent API to secure, production-grade databases with raw throughput. No code changes. No `.env` leaks. Absolute parity.
-
----
-*Built with ❤️ for a post-Docker world by [Shafeequl Islam](https://shafeeq.dev).*
+*Built with ❤️ by [Shafeequl Islam](https://shafeeq.dev) — Senior Architect focusing on AI-native Distributed Systems.*

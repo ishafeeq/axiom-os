@@ -9,3 +9,6 @@ axiom-ccp/axiom-ccp-frontend/node_modules/*
 axiom-ccp/axiom-ccp-frontend/dist/*
 axiom-cli/target/*
 axiom-shell/target/*
+
+cloud-apps.conf
+setup_cloud_proxy.sh
