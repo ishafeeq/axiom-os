@@ -89,7 +89,7 @@ ax init
 
 ---
 
-## 💡 Why Axiom? (For Hiring Managers)
+## 💡 Why Axiom?
 
 Axiom OS represents a shift in how we think about cloud infrastructure. It isn't just a deployment tool—it's a **Capability Orchestrator**. By moving the responsibility of "How" (Infra) away from the "What" (Logic), we enable:
 1.  **AI Agents to code faster** (Fewer tokens wasted on boilerplate).
