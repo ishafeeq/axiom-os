@@ -12,3 +12,5 @@ axiom-shell/target/*
 
 cloud-apps.conf
 setup_cloud_proxy.sh
+deploy_cloud.sh
+deploy_prod.sh
