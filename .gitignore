@@ -1,3 +1,4 @@
+*.DS_Store
 .cargo_home
 testing-proj
 new-testing
