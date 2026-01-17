@@ -2,7 +2,20 @@
   <img src="docs/axiom-logo.png" alt="Axiom OS Logo" width="120" />
   <h1>Axiom OS</h1>
   <h3>The Distributed Intelligence Layer & Cloud-Native Operating System</h3>
+  
   <p><b>Architecting the Post-Kubernetes Era with High-Performance Rust & Isolated Wasm Kernels.</b></p>
+
+  <p>
+    <a href="https://axiom-ccp.shafeeq.dev/" style="text-decoration:none;">
+      <img src="https://img.shields.io/badge/Live_Demo-Axiom_CCP-624DE8?style=for-the-badge&logo=rocket" alt="Live Demo" />
+    </a>
+  </p>
+
+  <p>
+    ✨ <b>Experience the Future of Distributed Intelligence Live:</b> ✨<br/>
+    <a href="https://axiom-ccp.shafeeq.dev/"><b>https://axiom-ccp.shafeeq.dev/</b></a><br/>
+    <i>Witness sub-millisecond Wasm orchestration, real-time observability, and adaptive resource binding in action.</i>
+  </p>
   
   <p>
     <img src="https://img.shields.io/badge/Language-Rust-orange?style=flat-square&logo=rust" alt="Rust" />
@@ -20,37 +33,59 @@ Axiom OS is a **distributed operating system** designed from the ground up for t
 
 While traditional architectures drown in Docker containers, K8s manifest bloat, and interpreted runtime overhead (Node.js/Python), Axiom leverages a **High-Performance Rust Host** to orchestrate intelligence at 1/10th the cost and 10x the velocity.
 
-### 🏛️ Architectural Pillars
+---
 
-*   **Intelligent Compute Isolation**: Leveraging `Wasmtime`, Axiom executes business logic (Tomains) in **Hyper-Isolated Nanoprocesses**. This provides **Air-Gapped Execution Sandboxes** by default—individual kernels have zero access to the host or network unless explicitly granted via a **Capability Manifest**.
-*   **Decoupled Infrastructure (The Intent API)**: Axiom Kernels do not know about connection strings, IP addresses, or secrets. They express **Intents** (e.g., "I need a Persistence Layer"). The **Central Control Plane (CCP)** dynamically maps these intents to physical resources (Postgres, Redis, LLM Gateways) based on the environmental context.
-*   **The Post-Docker Deployment Flow**: Say goodbye to slow CI/CD builds and registry bloat. Axiom hot-reloads `.wasm` binaries directly into the shell in **under 10ms**, enabling radical iterative speed for AI coding agents and human architects alike.
+## 🏗️ Current Implementation Highlights
+
+### ⚡ Sub-Millisecond Runtime
+- **Wasmtime Integration**: Uses the `wasmtime` engine with `wasi-preview1` support for lightning-fast, secure execution.
+- **Nanoprocess Isolation**: Each business logic unit (Tomain) runs in its own memory-isolated sandbox.
+- **Hot-Reloading**: Deploy `.wasm` binaries directly into the shell in **under 10ms** via Unix domain sockets.
+
+### 🛡️ Managed Egress & Security
+- **Egress Guard**: A host-level proxy that intercepts all network calls. Wasm kernels use logical aliases instead of physical URLs.
+- **Resilience Engine**: Built-in **Circuit Breakers** (reporting state changes to RED perspective) and **Rate Limiting** implemented in the `axiom-shell`.
+- **Capability Manifests**: Kernels have zero access to host resources unless explicitly defined in their manifest.
+
+### 🌐 Distributed Control Plane (CCP)
+- **Centralized Registry**: Maintains a shared `session.json` state across all shell instances, enabling seamless multi-shell communication.
+- **Real-Time Dashboards**: Built with **React** and **Axum**, providing deep visibility into capability graphs and service health.
+- **Adaptive Binding**: Dynamically re-bind database and LLM aliases without touching guest code.
+
+### 🛠️ SDK & Macros
+- **axiom-sdk**: High-level Rust library for Wasm guest apps, abstracting HTTP, DB, and Logging.
+- **axiom-macros**: Procedural macros (`#[axiom_api]`, `#[axiom_export_reflect]`) for automatic reflection and host-function bridging.
 
 ---
 
-## 🛰️ AI Architect & LLM Infrastructure Features
+## 🛰️ AI Architect & LLM Infrastructure
 
 Axiom OS is purposefully built to serve as the **backbone for LLM Orchestration**:
 
-*   **Unified AI Gateway**: Integrated support for **LiteLLM**, **Portkey**, and **Helicone**. Manage cost-optimized LLM routing, fallback policies, and circuit breaking at the infrastructure layer, not the application layer.
-*   **Architectural Observability**: Native integration with **Prometheus**, **Grafana**, and **Jaeger**. Track token consumption, request latency, and agentic trace-lines across the entire capability graph through a single pane of glass.
-*   **Adaptive Resource Binding**: Seamlessly promote models from GPT-3.5 (DEV) to Claude 3.5 Sonnet (STAGING) to GPT-4o (PROD) solely through the CCP Dashboard—**zero code changes required**.
-*   **Evaluation Gates**: Strategic hooks for **Promptfoo** and **DeepEval** allow for automated quality and safety gating during promotion cycles.
+*   **Unified AI Gateway**: Professional integration with **LiteLLM**, **Portkey**, and **Helicone** for cost-optimized routing and fallback.
+*   **Architectural Observability**: Native support for **Prometheus** and **Jaeger** to track token consumption and agentic trace-lines.
+*   **Audit Mode**: Integrated RED perspective for auditing state-changing operations across the cluster.
 
 ---
 
-## 🚀 The Stack & Strategy
+## 🔮 Next Steps & In-line Features
 
-### High-Performance Resilience
-Axiom replaces standard libraries with native, host-level primitives:
--   **Native Circuit Breakers** (Rust-based protection)
--   **Intelligent Rate Limiting** (Token bucket strategy across multi-tenant tomains)
--   **Real-time Telemetry** (OpenTelemetry native integration)
+- [ ] **WASI Sockets Support**: Transitioning towards standard WASI networking for broader library compatibility.
+- [ ] **Evaluation Gates**: Strategic hooks for **Promptfoo** and **DeepEval** to automate quality gating during promotion.
+- [ ] **Adaptive Resource Scaling**: Automatic scaling of Wasm kernels based on real-time throughput metrics.
+- [ ] **Cross-Regional CCP Sync**: Global state synchronization for geo-distributed Axiom clusters.
+- [ ] **Advanced Capability Discovery**: Auto-discovery of available Tomains via the reflection API.
 
-### Developer Workflow (`ax` CLI)
+---
+
+## 🚀 The Developer Workflow (`ax` CLI)
+
 ```bash
 # Initialize an AI-native workspace
 ax init my-service
+
+# Build and hot-swap local binary
+./build.sh
 
 # Dynamically bind a production database
 ax bind --name DB_MAIN --url postgresql://user:pass@prod-cluster.aws
