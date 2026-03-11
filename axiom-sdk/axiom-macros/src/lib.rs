@@ -25,15 +25,32 @@ pub fn axiom_api(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
     let summary = docs.join("\n");
 
-    // Extract params
-    let mut params = Vec::new();
+    // Extract params and generate extractions
+    let mut params_metadata = Vec::new();
+    let mut param_extractions = Vec::new();
+    let mut param_idents = Vec::new();
+
     for arg in &sig.inputs {
         if let FnArg::Typed(pat_type) = arg {
             if let Pat::Ident(pat_ident) = &*pat_type.pat {
                 let name = pat_ident.ident.to_string();
-                // For simplicity, we just store the name. 
-                // In a full impl, we'd map Rust types to OpenAPI types.
-                params.push(name);
+                let ident = quote::format_ident!("arg_{}", name);
+                
+                // Determine extraction logic based on type
+                let ty_str = quote!(#pat_type.ty).to_string();
+                let extraction = if ty_str.contains("Value") {
+                    quote! {
+                        let #ident = args_json[#name].clone();
+                    }
+                } else {
+                    quote! {
+                        let #ident = args_json[#name].as_str().unwrap_or("").to_string();
+                    }
+                };
+
+                params_metadata.push(name);
+                param_extractions.push(extraction);
+                param_idents.push(ident);
             }
         }
     }
@@ -41,23 +58,7 @@ pub fn axiom_api(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // Generic invocation wrapper
     let invoke_fn_name = quote::format_ident!("__axiom_call_{}", fn_name);
     let metadata_fn_name = quote::format_ident!("__axiom_metadata_{}", fn_name);
-    let params_tokens = params.iter().map(|p| quote! { #p });
-
-    let args_count = sig.inputs.len();
-
-    // Generate code to extract each param by name from the JSON
-    let param_extractions = params.iter().map(|p| {
-        let param_name = p.clone();
-        let param_ident = quote::format_ident!("arg_{}", p);
-        quote! {
-            let #param_ident = args_json[#param_name].as_str().unwrap_or("").to_string();
-        }
-    });
-
-    let param_idents = params.iter().map(|p| {
-        let param_ident = quote::format_ident!("arg_{}", p);
-        quote! { #param_ident }
-    });
+    let params_tokens = params_metadata.iter().map(|p| quote! { #p });
 
     let expanded = quote! {
         #input
@@ -120,7 +121,7 @@ pub fn axiom_export_reflect(input: TokenStream) -> TokenStream {
                 "delete" 
             } else if summary.to_lowercase().contains("put") || name.contains("put") { 
                 "put" 
-            } else if summary.to_lowercase().contains("post") || name.contains("post") || name.contains("submit") { 
+            } else if summary.to_lowercase().contains("post") || name.contains("submit") { 
                 "post" 
             } else { 
                 "get" 
